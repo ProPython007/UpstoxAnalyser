@@ -90,15 +90,15 @@ def get_holdings():
     st.write(json_response)
 
 
+st.write(get_details())
+# response = st.experimental_get_query_params()
+# if 'code' in response:
+#     login(response['code'][0])
+#     st.success('Login Successfull!')
 
-response = st.experimental_get_query_params()
-if 'code' in response:
-    login(response['code'][0])
-    st.success('Login Successfull!')
+#     holdings = st.button('Show Holdings')
+#     if holdings:
+#         st.write(get_holdings())
 
-    holdings = st.button('Show Holdings')
-    if holdings:
-        st.write(get_holdings())
-
-else:
-    connect()
+# else:
+#     connect()
