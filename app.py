@@ -59,7 +59,7 @@ def store_details(conf):
 
 response = st.experimental_get_query_params()
 if 'code' in response:
-    login()
+    login(response['code'])
     st.success('Login Successfull!')
 else:
     connect()
