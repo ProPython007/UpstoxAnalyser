@@ -50,7 +50,9 @@ def login(code):
     authorize()
 
 
-def authorize(conf):
+def authorize():
+    conf = get_details()
+
     url = "https://api-v2.upstox.com/login/authorization/token"
 
     headers = {
@@ -58,8 +60,8 @@ def authorize(conf):
     }
 
     data = {
-        "client_id": conf['apiKey']
-        # "redirect_uri": f"{conf['rurl']}/?code={conf['code']}",
+        "client_id": conf['apiKey'],
+        "redirect_uri": conf['rurl'],
     }
 
     requests.get(url, headers=headers, data=data)
@@ -78,7 +80,6 @@ def store_details(conf):
 
 def get_holdings():
     conf = get_details()
-    authorize(conf)
 
     url = 'https://api-v2.upstox.com/portfolio/long-term-holdings'
     
@@ -90,11 +91,11 @@ def get_holdings():
         "code": conf['code'],
         "client_id": conf['apiKey'],
         "client_secret": conf['secretKey'],
-        # "redirect_uri": f"{conf['rurl']}/?code={conf['code']}",
+        "redirect_uri": f"{conf['rurl']}/?loggedin=True",
         "grant_type": "authorization_code",
     }
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, data=data)
     json_response = response.json()
     st.write(json_response)
 
