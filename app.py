@@ -93,7 +93,7 @@ def get_holdings():
 
 response = st.experimental_get_query_params()
 if 'code' in response:
-    st.sidebar.markdown('In case of any errors: [restart-app]("https://upstoxapi.streamlit.app")')
+    st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
     login(response['code'][0])
     st.success('Login Successfull!')
 
