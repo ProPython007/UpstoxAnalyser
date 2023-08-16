@@ -48,9 +48,10 @@ def login(code):
         "grant_type": "authorization_code",
     }
 
+    response = requests.post(url, headers=headers, data=data)
+    json_response = response.json()
+    
     try:
-        response = requests.post(url, headers=headers, data=data)
-        json_response = response.json()
         access_token = json_response['access_token']
         conf['access_token'] = access_token
     except Exception:
