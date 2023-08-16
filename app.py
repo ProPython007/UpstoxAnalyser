@@ -60,10 +60,33 @@ def store_details(conf):
         json.dump(conf, f)
 
 
+def get_holdings():
+    conf = get_details()
+
+    url = 'https://api-v2.upstox.com/portfolio/long-term-holdings'
+    
+    headers = {
+        "Api-Version": "2.0"
+    }
+
+    data = {
+        "code": conf['code'],
+        "client_id": conf['apiKey'],
+        "client_secret": conf['secretKey'],
+        "redirect_uri": conf['rurl'],
+        "grant_type": "authorization_code",
+    }
+
+    response = requests.get(url, headers=headers, data=data)
+    json_response = response.json()
+    st.write(json_response)
+
+
+
 response = st.experimental_get_query_params()
 if 'code' in response:
     login(response['code'][0])
     st.success('Login Successfull!')
-    st.write(get_details())
+    get_holdings()
 else:
     connect()
