@@ -40,8 +40,11 @@ def login(code):
 
     response = requests.post(url, headers=headers, data=data)
     json_response = response.json()
-    access_token = json_response['access_token']
-    conf['access_token'] = access_token
+    try:
+        access_token = json_response['access_token']
+        conf['access_token'] = access_token
+    except Exception:
+        pass
 
     store_details(conf)
 
