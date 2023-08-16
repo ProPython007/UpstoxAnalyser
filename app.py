@@ -5,7 +5,47 @@ import requests
 import json
 
 
-@st.cache_data
+
+def connect():
+    conf = get_details()
+    redirect_url = urllib.parse.quote(conf['rurl'], safe='')
+    uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf['apiKey']}&redirect_uri={redirect_url}"
+
+    st.markdown(f'[Authorize with Upstox]({uri})')
+
+
+def login(code):
+    conf = get_details()
+    conf['code'] = code
+
+    store_details(conf)
+
+    conf = get_details()
+
+    url = "https://api-v2.upstox.com/login/authorization/token"
+
+    headers = {
+        "accept": "application/json",
+        "Api-Version": "2.0",
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+
+    data = {
+        "code": conf['code'],
+        "client_id": conf['apiKey'],
+        "client_secret": conf['secretKey'],
+        "redirect_uri": conf['rurl'],
+        "grant_type": "authorization_code",
+    }
+
+    response = requests.post(url, headers=headers, data=data)
+    json_response = response.json()
+    access_token = json_response['access_token']
+    conf['access_token'] = access_token
+
+    store_details(conf)
+
+
 def get_details():
     with open('config.json') as f:
         data = json.load(f)
@@ -17,16 +57,9 @@ def store_details(conf):
         json.dump(conf, f)
 
 
-conf = get_details()
-redirect_url = urllib.parse.quote(conf['rurl'], safe='')
-uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf['apiKey']}&redirect_uri={redirect_url}"
-
-# print(f'\nGOTO: {uri}\n')
-# code = input('Enter the code here: ')
-# conf['code'] = code
-st.markdown(f'[Authorize with Upstox]({uri})')
 response = st.experimental_get_query_params()
-print(response)
-
-
-# store_details(conf)
+if 'code' in response:
+    login()
+    st.success('Login Successfull!')
+else:
+    connect()
