@@ -32,10 +32,6 @@ def login(code):
     conf = get_details()
     conf['code'] = code
 
-    store_details(conf)
-
-    conf = get_details()
-
     url = "https://api-v2.upstox.com/login/authorization/token"
 
     headers = {
@@ -52,15 +48,15 @@ def login(code):
         "grant_type": "authorization_code",
     }
 
-    response = requests.post(url, headers=headers, data=data)
-    json_response = response.json()
     try:
+        response = requests.post(url, headers=headers, data=data)
+        json_response = response.json()
         access_token = json_response['access_token']
         conf['access_token'] = access_token
     except Exception:
         pass
 
-    store_details(conf)
+    return conf
 
 
 def get_details():
@@ -69,14 +65,12 @@ def get_details():
     return data
 
 
-def store_details(conf):
-    with open('config.json', 'w') as f:
-        json.dump(conf, f)
+# def store_details(conf):
+#     with open('config.json', 'w') as f:
+#         json.dump(conf, f)
 
 
-def get_holdings():
-    conf = get_details()
-
+def get_holdings(conf):
     url = 'https://api-v2.upstox.com/portfolio/long-term-holdings'
     
     headers = {
@@ -93,12 +87,14 @@ def get_holdings():
 
 response = st.experimental_get_query_params()
 if 'code' in response:
-    login(response['code'][0])
+    conf = login(response['code'][0])
+    if not conf:
+        st.stop()
     st.success('Login Successfull!')
 
     holdings = st.button('Show Holdings')
     if holdings:
-        st.write(get_holdings())
+        st.write(get_holdings(conf))
 
 else:
     connect()
