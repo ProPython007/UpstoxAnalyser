@@ -6,6 +6,20 @@ import json
 
 
 
+# Settings:
+## Extra CSS:
+st.set_page_config(page_title='Real Estate Investment Toolkit', page_icon=':bar_chart:', layout='wide')
+hide_st_style = '''
+    <style>
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+    </style>
+'''
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
+
+
 def connect():
     conf = get_details()
     redirect_url = urllib.parse.quote(conf['rurl'], safe='')
