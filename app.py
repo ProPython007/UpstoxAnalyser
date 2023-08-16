@@ -47,7 +47,6 @@ def login(code):
         pass
 
     store_details(conf)
-    authorize()
 
 
 def authorize(conf):
