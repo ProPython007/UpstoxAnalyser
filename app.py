@@ -8,7 +8,7 @@ import json
 
 # Settings:
 ## Extra CSS:
-st.set_page_config(page_title='Real Estate Investment Toolkit', page_icon=':bar_chart:', layout='wide')
+st.set_page_config(page_title='Upstox Portfolio Viewer', page_icon=':bar_chart:', layout='wide')
 hide_st_style = '''
     <style>
         #MainMenu {visibility: hidden;}
@@ -95,6 +95,10 @@ response = st.experimental_get_query_params()
 if 'code' in response:
     login(response['code'][0])
     st.success('Login Successfull!')
-    get_holdings()
+
+    holdings = st.button('Show Holdings')
+    if holdings:
+        st.write(get_holdings())
+
 else:
     connect()
