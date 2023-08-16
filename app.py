@@ -61,5 +61,6 @@ response = st.experimental_get_query_params()
 if 'code' in response:
     login(response['code'])
     st.success('Login Successfull!')
+    st.write(get_details())
 else:
     connect()
