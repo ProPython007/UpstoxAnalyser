@@ -1,5 +1,7 @@
 import plotly.graph_objects as go
+import plotly.express as px
 import streamlit as st
+import pandas as pd
 import urllib.parse
 import pandas as pd
 import requests
@@ -88,7 +90,7 @@ def get_holdings():
 
     response = requests.get(url, headers=headers)
     json_response = response.json()
-    
+
     return json_response
 
 
@@ -96,10 +98,28 @@ def get_investments_plot_by_price(data):
     labels = [name['company_name'] for name in data]
     values = [avg_price['average_price']*avg_price['quantity'] for avg_price in data]
 
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+    fig1 = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+    fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)')
 
-    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
-    st.plotly_chart(fig, use_container_width=True)
+    fig2 = px.bar(
+        values,
+        labels,
+        orientation="h",
+        title="<b>Investments per Company</b>",
+        color_discrete_sequence=["#0083B8"] * len(values),
+        template="plotly_white",
+    )
+    fig2.update_layout(
+        plot_bgcolor="rgba(0,0,0,0)",
+        xaxis=(dict(showgrid=False))
+    )
+
+    st.subheader('Distribution by Invested Amount')
+    l, r = st.columns(2)
+    with l:
+        st.plotly_chart(fig1, use_container_width=True)
+    with r:
+        st.plotly_chart(fig2, use_container_width=True)
 
 
 
