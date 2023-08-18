@@ -112,6 +112,7 @@ def plot_pnl(data):
     values = [price['pnl'] for price in data]
 
     df1 = pd.DataFrame(list(zip(labels, values)), columns=['Companies -->', 'PNLs -->'])
+    df1.sort_values(by=['PNLs -->'], inplace=True)
     fig1 = px.bar(
         df1,
         x = 'PNLs -->',
