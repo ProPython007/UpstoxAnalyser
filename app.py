@@ -102,12 +102,12 @@ def get_investments_plot_by_price(data):
     fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)', title="<b>Investments per Company by Weightage:</b>")
 
 
-    df = pd.DataFrame(list(zip(labels, values)), columns=['Companies', 'Amt'])
+    df = pd.DataFrame(list(zip(labels, values)), columns=['Companies -->', 'Amounts -->'])
     df.sort_values(by=['Amt'], inplace=True)
     fig2 = px.bar(
         df,
-        x = 'Amt',
-        y = 'Companies',
+        x = 'Amounts -->',
+        y = 'Companies -->',
         orientation="h",
         title="<b>Investments per Company by Amount:</b>",
     )
@@ -123,7 +123,7 @@ def get_investments_plot_by_price(data):
     with r:
         st.plotly_chart(fig2, use_container_width=True)
 
-    st.markdown(f'<h3>Total Amount Invested: {sum(values):.2f}</h3>')
+    st.markdown(f'Total Amount Invested: {sum(values):.2f} /-')
 
 
 
@@ -137,6 +137,7 @@ if 'code' in response:
     if holdings:
         data = get_holdings()
         get_investments_plot_by_price(data['data'])
+        st.markdown('##')
 
 else:
     connect()
