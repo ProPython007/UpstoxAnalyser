@@ -99,13 +99,13 @@ def get_investments_plot_by_price(data):
     values = [avg_price['average_price']*avg_price['quantity'] for avg_price in data]
 
     fig1 = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
-    fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)')
+    fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)', title="<b>Investments per Company by Weightage</b>")
 
     fig2 = px.bar(
-        values,
         labels,
+        values,
         orientation="h",
-        title="<b>Investments per Company</b>",
+        title="<b>Investments per Company by Amount</b>",
         color_discrete_sequence=["#0083B8"] * len(values),
         template="plotly_white",
     )
