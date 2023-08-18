@@ -101,13 +101,17 @@ def get_investments_plot_by_price(data):
     fig1 = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
     fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)', title="<b>Investments per Company by Weightage</b>")
 
+
+    df = pd.DataFrame(list(zip(labels, values)), columns=['Companies', 'Amt'])
+    df.sort_values(by=['Amt'], inplace=True)
     fig2 = px.bar(
-        labels,
-        values,
+        df,
+        x = 'Amount -->',
+        y = 'Companies -->',
         orientation="h",
         title="<b>Investments per Company by Amount</b>",
-        color_discrete_sequence=["#0083B8"] * len(values),
-        template="plotly_white",
+        # color_discrete_sequence=["#0083B8"] * len(values),
+        # template="plotly_white",
     )
     fig2.update_layout(
         plot_bgcolor="rgba(0,0,0,0)",
