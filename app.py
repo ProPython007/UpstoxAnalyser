@@ -104,7 +104,7 @@ def pnl(data):
     current = initial + net_pnl
 
     per = (current - initial) / initial
-    st.metric(label=f"NET PNL of Rs.{initial:.2f}", value=f"{current:.2f} /-", delta=f"{per*100:.2f}%")
+    st.metric(label=f"NET PNL of Rs. {initial:.2f} /-", value=f"{current:.2f} /-", delta=f"{per*100:.2f}%")
 
 
 def plot_pnl(data):
