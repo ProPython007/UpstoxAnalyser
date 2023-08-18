@@ -101,6 +101,7 @@ def get_investments_plot_by_price(data):
     st.plotly_chart(fig, use_container_width=True)
 
 
+
 response = st.experimental_get_query_params()
 if 'code' in response:
     st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
