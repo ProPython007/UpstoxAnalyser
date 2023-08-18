@@ -1,3 +1,4 @@
+import plotly.graph_objects as go
 import streamlit as st
 import urllib.parse
 import pandas as pd
@@ -90,6 +91,15 @@ def get_holdings():
     st.write(json_response)
 
 
+def get_investments_plot_by_price(data):
+    labels = [name['company_name'] for name in data]
+    values = [avg_price['average_price']*avg_price['quantity'] for avg_price in data]
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+
+    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
+    st.plotly_chart(fig, use_container_width=True)
+
 
 response = st.experimental_get_query_params()
 if 'code' in response:
@@ -99,7 +109,8 @@ if 'code' in response:
 
     holdings = st.button('Show Holdings')
     if holdings:
-        st.write(get_holdings())
+        data = get_holdings()
+        get_investments_plot_by_price(data['data'])
 
 else:
     connect()
