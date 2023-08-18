@@ -99,7 +99,7 @@ def get_investments_plot_by_price(data):
     values = [avg_price['average_price']*avg_price['quantity'] for avg_price in data]
 
     fig1 = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
-    fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)', title="<b>Investments per Company by Weightage</b>")
+    fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)', title="<b>Investments per Company by Weightage:</b>")
 
 
     df = pd.DataFrame(list(zip(labels, values)), columns=['Companies', 'Amt'])
@@ -109,13 +109,11 @@ def get_investments_plot_by_price(data):
         x = 'Amt',
         y = 'Companies',
         orientation="h",
-        title="<b>Investments per Company by Amount</b>",
-        # color_discrete_sequence=["#0083B8"] * len(values),
-        # template="plotly_white",
+        title="<b>Investments per Company by Amount:</b>",
     )
     fig2.update_layout(
         plot_bgcolor="rgba(0,0,0,0)",
-        xaxis=(dict(showgrid=False))
+        xaxis=(dict(showgrid=True))
     )
 
     st.subheader('Distribution by Invested Amount')
