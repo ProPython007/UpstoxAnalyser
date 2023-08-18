@@ -123,6 +123,8 @@ def get_investments_plot_by_price(data):
     with r:
         st.plotly_chart(fig2, use_container_width=True)
 
+    st.markdown(f'<h3>Total Amount Invested: {sum(values):.2f}</h3>')
+
 
 
 response = st.experimental_get_query_params()
