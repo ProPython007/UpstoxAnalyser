@@ -97,15 +97,16 @@ def get_holdings():
 def get_investments_plot_by_price(data):
     labels = [name['company_name'] for name in data]
     values = [avg_price['average_price']*avg_price['quantity'] for avg_price in data]
+    qts = [qt['quantity'] for qt in data]
 
     fig1 = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
     fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)', title="<b>Investments per Company by Weightage:</b>")
 
 
-    df = pd.DataFrame(list(zip(labels, values)), columns=['Companies -->', 'Amounts -->'])
-    df.sort_values(by=['Amounts -->'], inplace=True)
+    df1 = pd.DataFrame(list(zip(labels, values)), columns=['Companies -->', 'Amounts -->'])
+    df1.sort_values(by=['Amounts -->'], inplace=True)
     fig2 = px.bar(
-        df,
+        df1,
         x = 'Amounts -->',
         y = 'Companies -->',
         orientation="h",
@@ -116,13 +117,28 @@ def get_investments_plot_by_price(data):
         xaxis=(dict(showgrid=True))
     )
 
+    df2 = pd.DataFrame(list(zip(labels, qts)), columns=['Companies -->', 'Quantity -->'])
+    df2.sort_values(by=['Quantity -->'], inplace=True)
+    fig3 = px.bar(
+        df2,
+        x = 'Quantity -->',
+        y = 'Companies -->',
+        orientation="h",
+        title="<b>Shares per Company by Quantity:</b>",
+    )
+    fig3.update_layout(
+        plot_bgcolor="rgba(0,0,0,0)",
+        xaxis=(dict(showgrid=True))
+    )
+
     st.subheader('Distribution by Invested Amount')
     l, r = st.columns(2)
     with l:
         st.plotly_chart(fig1, use_container_width=True)
     with r:
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig3, use_container_width=True)
 
+    st.plotly_chart(fig2, use_container_width=True)
     st.markdown(f'Total Amount Invested: {sum(values):.2f} /-')
 
 
@@ -136,6 +152,7 @@ if 'code' in response:
     holdings = st.button('Show Holdings')
     if holdings:
         data = get_holdings()
+        st.write(data)
         get_investments_plot_by_price(data['data'])
         st.markdown('##')
 
