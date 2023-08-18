@@ -107,6 +107,26 @@ def pnl(data):
     st.metric(label=f"NET PNL of Rs.{initial:.2f}", value=f"{current:.2f} /-", delta=f"{per*100:.2f}%")
 
 
+def plot_pnl(data):
+    labels = [name['company_name'] for name in data]
+    values = [price['pnl'] for price in data]
+
+    df1 = pd.DataFrame(list(zip(labels, values)), columns=['Companies -->', 'PNLs -->'])
+    fig1 = px.bar(
+        df1,
+        x = 'PNLs -->',
+        y = 'Companies -->',
+        orientation="h",
+        title="<b>PNL per Company:</b>",
+    )
+    fig1.update_layout(
+        plot_bgcolor="rgba(0,0,0,0)",
+        xaxis=(dict(showgrid=True))
+    )
+    st.plotly_chart(fig1, use_container_width=True)
+    st.markdown(f'Net PNL: {sum(values):.2f} /-')
+
+
 
 def get_holdings():
     conf = get_details()
@@ -212,9 +232,9 @@ def get_wannabe_investments_plot_by_price(data):
 
     st.subheader('Distribution by Amount Required')
     l, r = st.columns(2)
-    with l:
-        st.plotly_chart(fig1, use_container_width=True)
     with r:
+        st.plotly_chart(fig1, use_container_width=True)
+    with l:
         st.plotly_chart(fig3, use_container_width=True)
 
     st.plotly_chart(fig2, use_container_width=True)
@@ -229,19 +249,19 @@ if 'code' in response:
     st.success('Login Successfull!')
 
     data = get_holdings()
-    st.write(data)
+    # st.write(data)
 
     profile = get_profile()
-    st.write(profile)
+    # st.write(profile)
 
     st.header(f"Welcome {profile['data']['user_name']}")
     pnl(data['data'])
+    plot_pnl(data['data'])
     st.markdown('##')
 
     with st.expander('Show Holdings'):
         get_investments_plot_by_price(data['data'])
         st.markdown('##')
-    st.markdown('##')
     with st.expander('Show Goals'):
         get_wannabe_investments_plot_by_price(data['data'])
         st.markdown('##')
