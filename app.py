@@ -77,6 +77,23 @@ def store_details(conf):
         json.dump(conf, f)
 
 
+def get_profile():
+    conf = get_details()
+
+    url = 'https://api-v2.upstox.com/user/profile'
+    
+    headers = {
+        "accept": "application/json",
+        "Api-Version": "2.0",
+        "Authorization": f"Bearer {conf['access_token']}",
+    }
+
+    response = requests.get(url, headers=headers)
+    json_response = response.json()
+
+    return json_response
+
+
 def get_holdings():
     conf = get_details()
 
@@ -199,6 +216,9 @@ if 'code' in response:
 
     data = get_holdings()
     st.write(data)
+
+    profile = get_profile()
+    st.write(profile)
 
     with st.expander('Show Holdings'):
         get_investments_plot_by_price(data['data'])
