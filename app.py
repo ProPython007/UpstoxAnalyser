@@ -234,7 +234,7 @@ if 'code' in response:
     profile = get_profile()
     st.write(profile)
 
-    st.header(f"Welcome {profile['user_name']}")
+    st.header(f"Welcome {profile['data']['user_name']}")
     pnl(data['data'])
     st.markdown('##')
 
