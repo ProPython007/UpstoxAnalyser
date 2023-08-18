@@ -94,6 +94,20 @@ def get_profile():
     return json_response
 
 
+def pnl(data):
+    net_pnl = 0
+    initial = sum([avg_price['average_price']*avg_price['quantity'] for avg_price in data])
+    
+    for pnl in data:
+        net_pnl += pnl['pnl']
+
+    current = initial + pnl
+
+    per = (current - initial) / initial
+    st.metric(label=f"NET PNL of Rs.{initial:.2f}", value=f"{current:.2f} /-", delta=f"{per*100:.2f}%")
+
+
+
 def get_holdings():
     conf = get_details()
 
@@ -220,10 +234,14 @@ if 'code' in response:
     profile = get_profile()
     st.write(profile)
 
+    st.header(f"Welcome {profile['user_name']}")
+    pnl(data['data'])
+    st.markdown('##')
+
     with st.expander('Show Holdings'):
         get_investments_plot_by_price(data['data'])
         st.markdown('##')
-    
+    st.markdown('##')
     with st.expander('Show Goals'):
         get_wannabe_investments_plot_by_price(data['data'])
         st.markdown('##')
