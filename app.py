@@ -103,7 +103,7 @@ def get_investments_plot_by_price(data):
 
 
     df = pd.DataFrame(list(zip(labels, values)), columns=['Companies -->', 'Amounts -->'])
-    df.sort_values(by=['Amt'], inplace=True)
+    df.sort_values(by=['Amounts -->'], inplace=True)
     fig2 = px.bar(
         df,
         x = 'Amounts -->',
