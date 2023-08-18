@@ -106,8 +106,8 @@ def get_investments_plot_by_price(data):
     df.sort_values(by=['Amt'], inplace=True)
     fig2 = px.bar(
         df,
-        x = 'Amount -->',
-        y = 'Companies -->',
+        x = 'Amt',
+        y = 'Companies',
         orientation="h",
         title="<b>Investments per Company by Amount</b>",
         # color_discrete_sequence=["#0083B8"] * len(values),
