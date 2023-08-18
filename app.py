@@ -88,7 +88,8 @@ def get_holdings():
 
     response = requests.get(url, headers=headers)
     json_response = response.json()
-    st.write(json_response)
+    
+    return json_response
 
 
 def get_investments_plot_by_price(data):
