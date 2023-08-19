@@ -226,13 +226,14 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity):
     values = [price['last_price']*(quantity - price['quantity']) if price['last_price']*(quantity - price['quantity']) > 0 else 0 for price in data]
     qts = [10 - qt['quantity'] for qt in data]
 
-    ltps = get_ltps(symbs)
     extra_labels = set(ltps['data'].keys()) - set(labels)
+    if extra_labels:
+        ltps = get_ltps(extra_labels)
 
-    for k, v in ltps['data']:
-        if k in extra_labels:
-            labels.append(k)
-            values.append(quantity*v['last_price'])
+        for k, v in ltps['data']:
+            if k in extra_labels:
+                labels.append(k)
+                values.append(quantity*v['last_price'])
 
     fig1 = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
     fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)', title="<b>Investments per Company by Price Weightage Required:</b>")
