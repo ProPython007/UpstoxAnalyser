@@ -300,18 +300,19 @@ if 'code' in response:
     with st.expander('Show Holdings'):
         get_investments_plot_by_price(data['data'])
         st.markdown('##')
-    with st.expander('Show Goals'):
-        st.write('in here')
+        
+    # with st.expander('Show Goals'):
+    st.subheader('Set Goals Here:')
 
-        symbs = st.multiselect(
-            'Select The Appropriate Symbols:',
-            options= ins_data['tradingsymbol'].unique(),
-            default= [name['company_name'] for name in data]
-        )
-        quantity = st.sidebar.slider('Quantity(s):', 1, 100, value=10, step=2)
+    symbs = st.multiselect(
+        'Select The Appropriate Symbols:',
+        options= ins_data['tradingsymbol'].unique(),
+        default= [name['company_name'] for name in data]
+    )
+    quantity = st.sidebar.slider('Quantity(s):', 1, 100, value=10, step=2)
 
-        get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
-        st.markdown('##')
+    get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
+    st.markdown('##')
 
 else:
     connect()
