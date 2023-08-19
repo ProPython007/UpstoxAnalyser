@@ -223,13 +223,13 @@ def get_ltps(symbs):
 
 def get_wannabe_investments_plot_by_price(data, symbs, quantity):
     labels = [name['company_name'] for name in data]
-    values = [price['last_price']*(quantity - price['quantity']) if price['last_price']*(quantity - price['quantity']) > 0 else 0 for price in data]
-    qts = [10 - qt['quantity'] for qt in data]
+    values = [price['last_price']*(quantity - price['quantity']) if (price['last_price']*(quantity - price['quantity'])) > 0 else 0 for price in data]
+    qts = [quantity - qt['quantity'] if (quantity - qt['quantity']) > 0 else 0 for qt in data]
 
     extra_labels = set(symbs) - set(labels)
     if extra_labels:
         ltps = get_ltps(extra_labels)
-        st.write(ltps)
+        # st.write(ltps)
 
         for k, v in ltps['data']:
             if k in extra_labels:
