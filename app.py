@@ -321,7 +321,7 @@ if 'code' in response:
         options= [name['company_name'] for name in data['data']],
         default= [name['company_name'] for name in data['data']]
     )
-    quantity = st.slider('Quantity(s) [ALL]:', 1, 100, value=10, step=2)
+    quantity = st.slider('Quantity(s) [ALL]:', 1, 100, value=10, step=1)
 
     get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
     st.markdown('##')
