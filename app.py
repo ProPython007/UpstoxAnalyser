@@ -301,6 +301,7 @@ if 'code' in response:
         get_investments_plot_by_price(data['data'])
         st.markdown('##')
     with st.expander('Show Goals'):
+        st.write('in here')
 
         symbs = st.multiselect(
             'Select The Appropriate Symbols:',
