@@ -23,6 +23,12 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
 
+@st.cache_data
+def load_instruments():
+    data = pd.read_csv('NSE.csv')
+    return data
+
+
 def connect():
     conf = get_details()
     redirect_url = urllib.parse.quote(conf['rurl'], safe='')
@@ -194,10 +200,39 @@ def get_investments_plot_by_price(data):
     st.markdown(f'Total Amount Invested: {sum(values):.2f} /-')
 
 
-def get_wannabe_investments_plot_by_price(data):
+def get_ltps(symbs):
+    to_fetch = ','.join(symbs)
+    conf = get_details()
+
+    url = 'https://api-v2.upstox.com/market-quote/ltp?symbol=NSE_EQ%7CINE848E01039' 
+    
+    headers = {
+        "accept": "application/json",
+        "Api-Version": "2.0",
+        "Authorization": f"Bearer {conf['access_token']}",
+    }
+    data = {
+        "symbol": to_fetch
+    }
+
+    response = requests.get(url, headers=headers, data=data)
+    json_response = response.json()
+
+    return json_response
+
+
+def get_wannabe_investments_plot_by_price(data, symbs, quantity):
     labels = [name['company_name'] for name in data]
-    values = [price['last_price']*(10 - price['quantity']) for price in data]
+    values = [price['last_price']*(quantity - price['quantity']) if price['last_price']*(quantity - price['quantity']) > 0 else 0 for price in data]
     qts = [10 - qt['quantity'] for qt in data]
+
+    ltps = get_ltps(symbs)
+    extra_labels = set(ltps['data'].keys()) - set(labels)
+
+    for k, v in ltps['data']:
+        if k in extra_labels:
+            labels.append(k)
+            values.append(quantity*v['last_price'])
 
     fig1 = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
     fig1.update_layout(plot_bgcolor='rgba(0,0,0,0)', title="<b>Investments per Company by Price Weightage Required:</b>")
@@ -249,6 +284,8 @@ if 'code' in response:
     login(response['code'][0])
     st.success('Login Successfull!')
 
+    ins_data = load_instruments()
+
     data = get_holdings()
     # st.write(data)
 
@@ -264,7 +301,15 @@ if 'code' in response:
         get_investments_plot_by_price(data['data'])
         st.markdown('##')
     with st.expander('Show Goals'):
-        get_wannabe_investments_plot_by_price(data['data'])
+
+        symbs = st.multiselect(
+            'Select The Appropriate Symbols:',
+            options= ins_data['tradingsymbol'].unique(),
+            default= [name['company_name'] for name in data]
+        )
+        quantity = st.sidebar.slider('Quantity(s):', 1, 100, value=10, step=2)
+
+        get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
         st.markdown('##')
 
 else:
