@@ -304,9 +304,11 @@ if 'code' in response:
     # with st.expander('Show Goals'):
     st.subheader('Set Goals Here:')
 
+    ops = list(ins_data['tradingsymbol'].unique())
+    ops.extend([name['company_name'] for name in data['data']])
     symbs = st.multiselect(
         'Select The Appropriate Symbols:',
-        options= ins_data['tradingsymbol'].unique(),
+        options= ops,
         default= [name['company_name'] for name in data['data']]
     )
     quantity = st.sidebar.slider('Quantity(s):', 1, 100, value=10, step=2)
