@@ -229,6 +229,7 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity):
     extra_labels = set(symbs) - set(labels)
     if extra_labels:
         ltps = get_ltps(extra_labels)
+        st.write(ltps)
 
         for k, v in ltps['data']:
             if k in extra_labels:
@@ -312,7 +313,7 @@ if 'code' in response:
         options= ops,
         default= [name['company_name'] for name in data['data']]
     )
-    quantity = st.sidebar.slider('Quantity(s):', 1, 100, value=10, step=2)
+    quantity = st.slider('Quantity(s) [ALL]:', 1, 100, value=10, step=2)
 
     get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
     st.markdown('##')
