@@ -213,7 +213,7 @@ def get_sell_charges(ins_token, quan, price):
     params = {
         "instrument_token": ins_token,
         "quantity": quan,
-        "product": "Delivery",
+        "product": "D",
         "transaction_type": "SELL",
         "price": price
     }
