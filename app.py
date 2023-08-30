@@ -227,17 +227,18 @@ def get_sell_charges(ins_token, quan, price):
 
 def get_all_sell_estimates(data):
     labels = [name['company_name'] for name in data]
-    qts = [qt['quantity'] for qt in data]
-    values = [avg_price['average_price']*avg_price['quantity'] for avg_price in data]
-    ltp = [lt['last_price'] for lt in data]
     ins_tokens = [tok['instrument_token'] for tok in data]
+    qts = [qt['quantity'] for qt in data]
+    price = [avg_price['average_price'] for avg_price in data]
+    # values = [avg_price['average_price']*avg_price['quantity'] for avg_price in data]
+    # ltp = [lt['last_price'] for lt in data]
     charges = []
 
-    for a, b, c in zip(ins_tokens, qts, ltp):
+    for a, b, c in zip(ins_tokens, qts, price):
         charges.append(get_sell_charges(a, b, c))
 
-    st.write("HI")
     st.write(labels)
+    st.write(price)
     st.write(charges)
 
 
