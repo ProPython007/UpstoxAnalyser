@@ -200,7 +200,7 @@ def get_investments_plot_by_price(data):
     st.markdown(f'Total Amount Invested: {sum(values):.2f} /-')
 
 
-def get_sell_charges(product, quan, price):
+def get_sell_charges(ins_token, quan, price):
     conf = get_details()
 
     url = 'https://api-v2.upstox.com/charges/brokerage'    
@@ -211,9 +211,9 @@ def get_sell_charges(product, quan, price):
         "Authorization": f"Bearer {conf['access_token']}",
     }
     params = {
-        "instrument_token": "NSE_EQ",
+        "instrument_token": ins_token,
         "quantity": quan,
-        "product": product,
+        "product": "Delivery",
         "transaction_type": "SELL",
         "price": price
     }
@@ -230,11 +230,11 @@ def get_all_sell_estimates(data):
     qts = [qt['quantity'] for qt in data]
     values = [avg_price['average_price']*avg_price['quantity'] for avg_price in data]
     ltp = [lt['last_price'] for lt in data]
+    ins_tokens = [tok['instrument_token'] for tok in data]
     charges = []
 
-    for a, b, c in zip(labels, qts, ltp):
+    for a, b, c in zip(ins_tokens, qts, ltp):
         charges.append(get_sell_charges(a, b, c))
-        break
 
     st.write("HI")
     st.write(labels)
