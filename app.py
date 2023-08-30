@@ -200,44 +200,44 @@ def get_investments_plot_by_price(data):
     st.markdown(f'Total Amount Invested: {sum(values):.2f} /-')
 
 
-def get_sell_charges(ins_token, quan, price):
-    conf = get_details()
+# def get_sell_charges(ins_token, quan, price):
+#     conf = get_details()
 
-    url = 'https://api-v2.upstox.com/charges/brokerage'    
+#     url = 'https://api-v2.upstox.com/charges/brokerage'    
     
-    headers = {
-        "accept": "application/json",
-        "Api-Version": "2.0",
-        "Authorization": f"Bearer {conf['access_token']}",
-    }
-    params = {
-        "instrument_token": ins_token,
-        "quantity": quan,
-        "product": "D",
-        "transaction_type": "SELL",
-        "price": price
-    }
+#     headers = {
+#         "accept": "application/json",
+#         "Api-Version": "2.0",
+#         "Authorization": f"Bearer {conf['access_token']}",
+#     }
+#     params = {
+#         "instrument_token": ins_token,
+#         "quantity": quan,
+#         "product": "D",
+#         "transaction_type": "SELL",
+#         "price": price
+#     }
 
-    response = requests.get(url, headers=headers, params=params)
-    json_response = response.json()
-    st.write(json_response)
+#     response = requests.get(url, headers=headers, params=params)
+#     json_response = response.json()
+#     st.write(json_response)
 
-    return json_response['data']['charges']['total']
+#     return json_response['data']['charges']['total']
 
 
-def get_all_sell_estimates(data):
-    labels = [name['company_name'] for name in data]
-    ins_tokens = [tok['instrument_token'] for tok in data]
-    qts = [qt['quantity'] for qt in data]
-    ltp = [lt['last_price'] for lt in data]
-    charges = []
+# def get_all_sell_estimates(data):
+#     labels = [name['company_name'] for name in data]
+#     ins_tokens = [tok['instrument_token'] for tok in data]
+#     qts = [qt['quantity'] for qt in data]
+#     ltp = [lt['last_price'] for lt in data]
+#     charges = []
 
-    for a, b, c in zip(ins_tokens, qts, ltp):
-        charges.append(get_sell_charges(a, b, c))
+#     for a, b, c in zip(ins_tokens, qts, ltp):
+#         charges.append(get_sell_charges(a, b, c))
 
-    st.write(labels)
-    st.write(ltp)
-    st.write(charges)
+#     st.write(labels)
+#     st.write(ltp)
+#     st.write(charges)
 
 
 def get_ltps(symbs):
@@ -350,7 +350,7 @@ if 'code' in response:
     with st.expander('Show Holdings'):
         get_investments_plot_by_price(data['data'])
         st.markdown('##')
-        get_all_sell_estimates(data['data'])
+        # get_all_sell_estimates(data['data'])
 
     # with st.expander('Show Goals'):
     st.subheader('Set Goals Here:')
