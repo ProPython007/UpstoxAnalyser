@@ -229,7 +229,6 @@ def get_all_sell_estimates(data):
     labels = [name['company_name'] for name in data]
     ins_tokens = [tok['instrument_token'] for tok in data]
     qts = [qt['quantity'] for qt in data]
-    # price = [avg_price['average_price'] for avg_price in data]
     ltp = [lt['last_price'] for lt in data]
     charges = []
 
@@ -245,18 +244,18 @@ def get_ltps(symbs):
     to_fetch = ','.join(symbs)
     conf = get_details()
 
-    url = 'https://api-v2.upstox.com/market-quote/ltp?symbol=NSE_EQ%7CINE848E01039' 
+    url = 'https://api-v2.upstox.com/market-quote/ltp' 
     
     headers = {
         "accept": "application/json",
         "Api-Version": "2.0",
         "Authorization": f"Bearer {conf['access_token']}",
     }
-    data = {
+    params = {
         "symbol": to_fetch
     }
 
-    response = requests.get(url, headers=headers, data=data)
+    response = requests.get(url, headers=headers, params=params)
     json_response = response.json()
 
     return json_response
