@@ -220,6 +220,7 @@ def get_sell_charges(product, quan, price):
 
     response = requests.get(url, headers=headers, data=data)
     json_response = response.json()
+    st.write(json_response)
 
     return json_response['data']['charges']['total']
 
