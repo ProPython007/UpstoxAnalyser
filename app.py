@@ -210,7 +210,7 @@ def get_sell_charges(product, quan, price):
         "Api-Version": "2.0",
         "Authorization": f"Bearer {conf['access_token']}",
     }
-    data = {
+    params = {
         "instrument_token": "NSE_EQ",
         "quantity": quan,
         "product": product,
@@ -218,7 +218,7 @@ def get_sell_charges(product, quan, price):
         "price": price
     }
 
-    response = requests.get(url, headers=headers, data=data)
+    response = requests.get(url, headers=headers, params=params)
     json_response = response.json()
     st.write(json_response)
 
