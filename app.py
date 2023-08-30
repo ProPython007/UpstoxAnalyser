@@ -234,6 +234,7 @@ def get_all_sell_estimates(data):
 
     for a, b, c in zip(labels, qts, ltp):
         charges.append(get_sell_charges(a, b, c))
+        break
 
     st.write("HI")
     st.write(labels)
