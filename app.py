@@ -213,7 +213,7 @@ def get_sell_charges(ins_token, quan, price):
     params = {
         "instrument_token": ins_token,
         "quantity": quan,
-        "product": "D",
+        "product": "CNC",
         "transaction_type": "SELL",
         "price": price
     }
@@ -230,8 +230,6 @@ def get_all_sell_estimates(data):
     ins_tokens = [tok['instrument_token'] for tok in data]
     qts = [qt['quantity'] for qt in data]
     price = [avg_price['average_price'] for avg_price in data]
-    # values = [avg_price['average_price']*avg_price['quantity'] for avg_price in data]
-    # ltp = [lt['last_price'] for lt in data]
     charges = []
 
     for a, b, c in zip(ins_tokens, qts, price):
