@@ -203,7 +203,7 @@ def get_investments_plot_by_price(data):
 def get_sell_charges(product, quan, price):
     conf = get_details()
 
-    url = 'https://api-v2.upstox.com/charges/brokerage?instrument_token=NSE_EQ%7CINE848E01039&quantity=10&product=MIS&transaction_type=Buy&price=16.20'    
+    url = 'https://api-v2.upstox.com/charges/brokerage'    
     
     headers = {
         "accept": "application/json",
