@@ -200,6 +200,44 @@ def get_investments_plot_by_price(data):
     st.markdown(f'Total Amount Invested: {sum(values):.2f} /-')
 
 
+def get_sell_charges(product, quan, price):
+    conf = get_details()
+
+    url = 'https://api-v2.upstox.com/charges/brokerage?instrument_token=NSE_EQ%7CINE848E01039&quantity=10&product=MIS&transaction_type=Buy&price=16.20'    
+    
+    headers = {
+        "accept": "application/json",
+        "Api-Version": "2.0",
+        "Authorization": f"Bearer {conf['access_token']}",
+    }
+    data = {
+        "instrument_token": "NSE_EQ",
+        "quantity": quan,
+        "product": product,
+        "transaction_type": "SELL",
+        "price": price
+    }
+
+    response = requests.get(url, headers=headers, data=data)
+    json_response = response.json()
+
+    return json_response['data']['charges']['total']
+
+
+def get_all_sell_estimates(data):
+    labels = [name['company_name'] for name in data]
+    qts = [qt['quantity'] for qt in data]
+    values = [avg_price['average_price']*avg_price['quantity'] for avg_price in data]
+    ltp = [lt['last_price'] for lt in data]
+    charges = []
+
+    for a, b, c in zip(labels, qts, ltp):
+        charges.append(get_sell_charges(a, b, c))
+
+    st.write(labels)
+    st.write(charges)
+
+
 def get_ltps(symbs):
     to_fetch = ','.join(symbs)
     conf = get_details()
@@ -310,6 +348,7 @@ if 'code' in response:
     with st.expander('Show Holdings'):
         get_investments_plot_by_price(data['data'])
         st.markdown('##')
+        get_all_sell_estimates(data['data'])
 
     # with st.expander('Show Goals'):
     st.subheader('Set Goals Here:')
