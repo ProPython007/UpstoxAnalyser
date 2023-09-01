@@ -337,8 +337,10 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity):
 response = st.experimental_get_query_params()
 if 'code' in response:
     st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
-    if not login(response['code'][0]):
-        st.stop()
+
+    if get_details()['access_token'] is None:
+        if not login(response['code'][0]):
+            st.stop()
     st.success('Login Successfull!')
 
     # ins_data = load_instruments()
