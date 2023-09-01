@@ -23,10 +23,10 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
 
-@st.cache_data
-def load_instruments():
-    data = pd.read_csv('NSE.csv')
-    return data
+# @st.cache_data
+# def load_instruments():
+#     data = pd.read_csv('NSE.csv')
+#     return data
 
 
 def connect():
@@ -96,6 +96,8 @@ def get_profile():
 
     response = requests.get(url, headers=headers)
     json_response = response.json()
+
+    st.header(f"Welcome {json_response['data']['user_name']}")
 
     return json_response
 
@@ -334,7 +336,7 @@ if 'code' in response:
     login(response['code'][0])
     st.success('Login Successfull!')
 
-    ins_data = load_instruments()
+    # ins_data = load_instruments()
 
     data = get_holdings()
     # st.write(data)
@@ -342,7 +344,7 @@ if 'code' in response:
     profile = get_profile()
     # st.write(profile)
 
-    st.header(f"Welcome {profile['data']['user_name']}")
+    # st.header(f"Welcome {profile['data']['user_name']}")
     pnl(data['data'])
     plot_pnl(data['data'])
     st.markdown('##')
