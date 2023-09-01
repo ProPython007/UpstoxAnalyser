@@ -317,7 +317,7 @@ if 'code' in response:
 
     conf = get_details()
     conf['code'] = response['code'][0]
-    store_details(conf)
+    # store_details(conf)
 
     login_response = login(conf)
     try:
@@ -325,11 +325,11 @@ if 'code' in response:
         conf['access_token'] = access_token
     except Exception:
         pass
-    store_details(conf)
+    # store_details(conf)
     st.success('Login Successfull!')
 
     # ins_data = load_instruments()
-    conf = get_details()
+    # conf = get_details()
 
     data = get_holdings(conf)
     # st.write(data)
