@@ -32,7 +32,6 @@ def setup_config():
     if 'code' in response:
         json_response = {}
         while 'access_token' not in json_response:
-            st.write(response)
             code = response['code'][0]
 
             conf_file['code'] = code
@@ -52,13 +51,8 @@ def setup_config():
                 "grant_type": "authorization_code",
             }
 
-            st.write(headers)
-            st.write(data)
-
             response = requests.post(url, headers=headers, data=data)
             json_response = response.json()
-        
-        st.write(f'\njres: {json_response}')
 
         access_token = json_response['access_token']
         
