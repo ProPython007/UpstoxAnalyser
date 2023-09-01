@@ -25,6 +25,7 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 @st.cache_resource
 def setup_config(code):
+    print('\ncode:', code)
     conf = get_details()
 
     conf['code'] = code
@@ -46,6 +47,7 @@ def setup_config(code):
 
     response = requests.post(url, headers=headers, data=data)
     json_response = response.json()
+    print('\njres:', json_response)
 
     access_token = json_response['access_token']
     
@@ -65,11 +67,6 @@ def get_details():
     with open('config.json') as f:
         data = json.load(f)
     return data
-
-
-# def store_details(conf):
-#     with open('config.json', 'w') as f:
-#         json.dump(conf, f)
 
 
 def get_profile(conf):
@@ -280,8 +277,6 @@ if 'code' in response:
     data = get_holdings(conf)
 
     profile = get_profile(conf)
-    print('profile:', profile)
-    st.write(profile)
 
     st.header(f"Welcome {profile['data']['user_name']}")
     pnl(data['data'])
@@ -303,8 +298,6 @@ if 'code' in response:
 
     get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
     st.markdown('##')
-
-    # store_details(conf)
 
 else:
     conf = get_details()
