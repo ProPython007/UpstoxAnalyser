@@ -279,6 +279,7 @@ if 'code' in response:
     data = get_holdings(conf)
 
     profile = get_profile(conf)
+    print('profile:', profile)
     st.write(profile)
 
     st.header(f"Welcome {profile['data']['user_name']}")
