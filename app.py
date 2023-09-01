@@ -28,30 +28,29 @@ def setup_config():
         conf_file = json.load(f)
 
     response = st.experimental_get_query_params()
-    st.write(response)
 
     if 'code' in response:
-        code = response['code'][0]
-
-        conf_file['code'] = code
-
-        url = "https://api-v2.upstox.com/login/authorization/token"
-
-        headers = {
-            "accept": "application/json",
-            "Api-Version": "2.0",
-            "Content-Type": "application/x-www-form-urlencoded",
-        }
-        data = {
-            "code": code,
-            "client_id": conf_file['apiKey'],
-            "client_secret": conf_file['secretKey'],
-            "redirect_uri": conf_file['rurl'],
-            "grant_type": "authorization_code",
-        }
-
         json_response = {}
         while 'access_token' not in json_response:
+            code = response['code'][0]
+
+            conf_file['code'] = code
+
+            url = "https://api-v2.upstox.com/login/authorization/token"
+
+            headers = {
+                "accept": "application/json",
+                "Api-Version": "2.0",
+                "Content-Type": "application/x-www-form-urlencoded",
+            }
+            data = {
+                "code": code,
+                "client_id": conf_file['apiKey'],
+                "client_secret": conf_file['secretKey'],
+                "redirect_uri": conf_file['rurl'],
+                "grant_type": "authorization_code",
+            }
+
             response = requests.post(url, headers=headers, data=data)
             json_response = response.json()
         
