@@ -29,22 +29,14 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 #     return data
 
 
-def connect():
-    conf = get_details()
+def connect(conf):
     redirect_url = urllib.parse.quote(conf['rurl'], safe='')
     uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf['apiKey']}&redirect_uri={redirect_url}"
 
     st.markdown(f'[Authorize with Upstox]({uri})')
 
 
-def login(code):
-    conf = get_details()
-    conf['code'] = code
-
-    store_details(conf)
-
-    conf = get_details()
-
+def login(conf):
     url = "https://api-v2.upstox.com/login/authorization/token"
 
     headers = {
@@ -63,13 +55,8 @@ def login(code):
 
     response = requests.post(url, headers=headers, data=data)
     json_response = response.json()
-    try:
-        access_token = json_response['access_token']
-        conf['access_token'] = access_token
-    except Exception:
-        pass
-
-    store_details(conf)
+    
+    return json_response
 
 
 def get_details():
@@ -84,8 +71,6 @@ def store_details(conf):
 
 
 def get_profile(conf):
-    # conf = get_details()
-
     url = 'https://api-v2.upstox.com/user/profile'
     
     headers = {
@@ -97,9 +82,7 @@ def get_profile(conf):
     response = requests.get(url, headers=headers)
     json_response = response.json()
 
-    st.header(f"Welcome {json_response['data']['user_name']}")
-
-    # return json_response
+    return json_response
 
 
 def pnl(data):
@@ -137,9 +120,7 @@ def plot_pnl(data):
 
 
 
-def get_holdings():
-    conf = get_details()
-
+def get_holdings(conf):
     url = 'https://api-v2.upstox.com/portfolio/long-term-holdings'
     
     headers = {
@@ -150,8 +131,6 @@ def get_holdings():
 
     response = requests.get(url, headers=headers)
     json_response = response.json()
-
-    get_profile(conf)
 
     return json_response
 
@@ -335,18 +314,30 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity):
 response = st.experimental_get_query_params()
 if 'code' in response:
     st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
-    login(response['code'][0])
+
+    conf = get_details()
+    conf['code'] = response['code'][0]
+    store_details(conf)
+
+    login_response = login(conf)
+    try:
+        access_token = login_response['access_token']
+        conf['access_token'] = access_token
+    except Exception:
+        pass
+    store_details(conf)
     st.success('Login Successfull!')
 
     # ins_data = load_instruments()
+    conf = get_details()
 
-    data = get_holdings()
+    data = get_holdings(conf)
     # st.write(data)
 
-    # profile = get_profile()
+    profile = get_profile(conf)
     # st.write(profile)
 
-    # st.header(f"Welcome {profile['data']['user_name']}")
+    st.header(f"Welcome {profile['data']['user_name']}")
     pnl(data['data'])
     plot_pnl(data['data'])
     st.markdown('##')
@@ -372,4 +363,5 @@ if 'code' in response:
     st.markdown('##')
 
 else:
-    connect()
+    conf = get_details()
+    connect(conf)
