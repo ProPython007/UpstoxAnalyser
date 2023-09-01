@@ -27,13 +27,29 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 def setup_config(code):
     conf = get_details()
 
-    if conf['code'] != code:
-        conf['code'] = code
+    conf['code'] = code
 
-        login_response = login(conf)
+    url = "https://api-v2.upstox.com/login/authorization/token"
 
-        access_token = login_response['access_token']
-        conf['access_token'] = access_token
+    headers = {
+        "accept": "application/json",
+        "Api-Version": "2.0",
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+    data = {
+        "code": conf['code'],
+        "client_id": conf['apiKey'],
+        "client_secret": conf['secretKey'],
+        "redirect_uri": conf['rurl'],
+        "grant_type": "authorization_code",
+    }
+
+    response = requests.post(url, headers=headers, data=data)
+    json_response = response.json()
+
+    access_token = json_response['access_token']
+    
+    conf['access_token'] = access_token
 
     return conf
 
@@ -45,38 +61,15 @@ def connect(conf):
     st.markdown(f'[Authorize with Upstox]({uri})')
 
 
-def login(conf):
-    url = "https://api-v2.upstox.com/login/authorization/token"
-
-    headers = {
-        "accept": "application/json",
-        "Api-Version": "2.0",
-        "Content-Type": "application/x-www-form-urlencoded",
-    }
-
-    data = {
-        "code": conf['code'],
-        "client_id": conf['apiKey'],
-        "client_secret": conf['secretKey'],
-        "redirect_uri": conf['rurl'],
-        "grant_type": "authorization_code",
-    }
-
-    response = requests.post(url, headers=headers, data=data)
-    json_response = response.json()
-    
-    return json_response
-
-
 def get_details():
     with open('config.json') as f:
         data = json.load(f)
     return data
 
 
-def store_details(conf):
-    with open('config.json', 'w') as f:
-        json.dump(conf, f)
+# def store_details(conf):
+#     with open('config.json', 'w') as f:
+#         json.dump(conf, f)
 
 
 def get_profile(conf):
@@ -311,7 +304,7 @@ if 'code' in response:
     get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
     st.markdown('##')
 
-    store_details(conf)
+    # store_details(conf)
 
 else:
     conf = get_details()
