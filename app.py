@@ -30,41 +30,38 @@ def setup_config():
     response = st.experimental_get_query_params()
 
     if 'code' in response:
-        json_response = {}
-        while 'access_token' not in json_response:
-            # st.write(response)
-            code = response['code'][0]
+        code = response['code'][0]
 
-            conf_file['code'] = code
+        conf_file['code'] = code
 
-            url = "https://api-v2.upstox.com/login/authorization/token"
+        url = "https://api-v2.upstox.com/login/authorization/token"
 
-            headers = {
-                "accept": "application/json",
-                "Api-Version": "2.0",
-                "Content-Type": "application/x-www-form-urlencoded",
-            }
-            data = {
-                "code": code,
-                "client_id": conf_file['apiKey'],
-                "client_secret": conf_file['secretKey'],
-                "redirect_uri": conf_file['rurl'],
-                "grant_type": "authorization_code",
-            }
+        headers = {
+            "accept": "application/json",
+            "Api-Version": "2.0",
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+        data = {
+            "code": code,
+            "client_id": conf_file['apiKey'],
+            "client_secret": conf_file['secretKey'],
+            "redirect_uri": conf_file['rurl'],
+            "grant_type": "authorization_code",
+        }
 
-            post_response = requests.post(url, headers=headers, data=data)
-            json_response = post_response.json()
+        post_response = requests.post(url, headers=headers, data=data)
+        json_response = post_response.json()
 
-            st.write(response)
-            st.write(headers)
-            st.write(data)
-            st.write(post_response)
+        if 'access_token' not in json_response:
+            uri = f"https://upstoxapi.streamlit.app"
+            st.markdown(f'[Something went wrong!!! Please restart the app]({uri})')
+            st.stop()
 
         access_token = json_response['access_token']
         
         conf_file['access_token'] = access_token
 
-        return conf_file, True
+        return conf_file
     
     else:
         uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf_file['apiKey']}&redirect_uri={conf_file['rurl']}"
@@ -268,12 +265,9 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity, conf):
 
 
 
-resume = False
 st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
 
-conf, resume = setup_config()
-if not resume:
-    st.stop()
+conf = setup_config()
 
 st.success('Login Successfull!')
 
