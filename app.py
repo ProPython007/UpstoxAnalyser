@@ -266,14 +266,18 @@ if 'code' in response:
     st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
 
     conf = get_details()
-    conf['code'] = response['code'][0]
 
-    login_response = login(conf)
-    try:
+    if conf['code'] != response['code'][0]:
+        conf['code'] = response['code'][0]
+
+        login_response = login(conf)
+
+        if not login_response:
+            st.stop()
+
         access_token = login_response['access_token']
         conf['access_token'] = access_token
-    except Exception:
-        pass
+
     st.success('Login Successfull!')
 
     data = get_holdings(conf)
