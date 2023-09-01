@@ -55,6 +55,11 @@ def setup_config():
             post_response = requests.post(url, headers=headers, data=data)
             json_response = post_response.json()
 
+            st.write(response)
+            st.write(headers)
+            st.write(data)
+            st.write(post_response)
+
         access_token = json_response['access_token']
         
         conf_file['access_token'] = access_token
