@@ -2,6 +2,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
 import pandas as pd
+import urllib.parse
 import pandas as pd
 import requests
 import json
@@ -22,53 +23,71 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
 
-def setup_config():
-    with open('config.json') as f:
-        conf_file = json.load(f)
+# @st.cache_data
+# def load_instruments():
+#     data = pd.read_csv('NSE.csv')
+#     return data
 
-    response = st.experimental_get_query_params()
 
-    if 'code' in response:
-        code = response['code'][0]
+def connect():
+    conf = get_details()
+    redirect_url = urllib.parse.quote(conf['rurl'], safe='')
+    uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf['apiKey']}&redirect_uri={redirect_url}"
 
-        conf_file['code'] = code
+    st.markdown(f'[Authorize with Upstox]({uri})')
 
-        url = "https://api-v2.upstox.com/login/authorization/token"
 
-        headers = {
-            "accept": "application/json",
-            "Api-Version": "2.0",
-            "Content-Type": "application/x-www-form-urlencoded",
-        }
-        data = {
-            "code": code,
-            "client_id": conf_file['apiKey'],
-            "client_secret": conf_file['secretKey'],
-            "redirect_uri": conf_file['rurl'],
-            "grant_type": "authorization_code",
-        }
+def login(code):
+    conf = get_details()
+    conf['code'] = code
 
-        post_response = requests.post(url, headers=headers, data=data)
-        json_response = post_response.json()
+    store_details(conf)
 
-        if 'access_token' not in json_response:
-            uri = f"https://upstoxapi.streamlit.app"
-            st.markdown(f'[Something went wrong!!! Please restart the app]({uri})')
-            st.stop()
+    conf = get_details()
 
+    url = "https://api-v2.upstox.com/login/authorization/token"
+
+    headers = {
+        "accept": "application/json",
+        "Api-Version": "2.0",
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+
+    data = {
+        "code": conf['code'],
+        "client_id": conf['apiKey'],
+        "client_secret": conf['secretKey'],
+        "redirect_uri": conf['rurl'],
+        "grant_type": "authorization_code",
+    }
+
+    response = requests.post(url, headers=headers, data=data)
+    json_response = response.json()
+    try:
         access_token = json_response['access_token']
-        
-        conf_file['access_token'] = access_token
-
-        return conf_file, True
-    
-    else:
-        uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf_file['apiKey']}&redirect_uri={conf_file['rurl']}"
-        st.markdown(f'[Authorize with Upstox]({uri})')
+        conf['access_token'] = access_token
+    except Exception:
+        uri = f"https://upstoxapi.streamlit.app"
+        st.markdown(f'[Something went wrong!!! Please restart the app]({uri})')
         st.stop()
 
+    store_details(conf)
 
-def get_profile(conf):
+
+def get_details():
+    with open('config.json') as f:
+        data = json.load(f)
+    return data
+
+
+def store_details(conf):
+    with open('config.json', 'w') as f:
+        json.dump(conf, f)
+
+
+def get_profile():
+    conf = get_details()
+
     url = 'https://api-v2.upstox.com/user/profile'
     
     headers = {
@@ -118,7 +137,9 @@ def plot_pnl(data):
 
 
 
-def get_holdings(conf):
+def get_holdings():
+    conf = get_details()
+
     url = 'https://api-v2.upstox.com/portfolio/long-term-holdings'
     
     headers = {
@@ -181,8 +202,49 @@ def get_investments_plot_by_price(data):
     st.markdown(f'Total Amount Invested: {sum(values):.2f} /-')
 
 
-def get_ltps(symbs, conf):
+# def get_sell_charges(ins_token, quan, price):
+#     conf = get_details()
+
+#     url = 'https://api-v2.upstox.com/charges/brokerage'    
+    
+#     headers = {
+#         "accept": "application/json",
+#         "Api-Version": "2.0",
+#         "Authorization": f"Bearer {conf['access_token']}",
+#     }
+#     params = {
+#         "instrument_token": ins_token,
+#         "quantity": quan,
+#         "product": "D",
+#         "transaction_type": "SELL",
+#         "price": price
+#     }
+
+#     response = requests.get(url, headers=headers, params=params)
+#     json_response = response.json()
+#     st.write(json_response)
+
+#     return json_response['data']['charges']['total']
+
+
+# def get_all_sell_estimates(data):
+#     labels = [name['company_name'] for name in data]
+#     ins_tokens = [tok['instrument_token'] for tok in data]
+#     qts = [qt['quantity'] for qt in data]
+#     ltp = [lt['last_price'] for lt in data]
+#     charges = []
+
+#     for a, b, c in zip(ins_tokens, qts, ltp):
+#         charges.append(get_sell_charges(a, b, c))
+
+#     st.write(labels)
+#     st.write(ltp)
+#     st.write(charges)
+
+
+def get_ltps(symbs):
     to_fetch = ','.join(symbs)
+    conf = get_details()
 
     url = 'https://api-v2.upstox.com/market-quote/ltp' 
     
@@ -201,7 +263,10 @@ def get_ltps(symbs, conf):
     return json_response
 
 
-def get_wannabe_investments_plot_by_price(data, symbs, quantity, conf):
+def get_wannabe_investments_plot_by_price(data, symbs, quantity):
+    # labels = [name['company_name'] for name in data]
+    # values = [price['last_price']*(quantity - price['quantity']) if (price['last_price']*(quantity - price['quantity'])) > 0 else 0 for price in data]
+    # qts = [quantity - qt['quantity'] if (quantity - qt['quantity']) > 0 else 0 for qt in data]
     labels = []
     values = []
     qts = []
@@ -213,7 +278,8 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity, conf):
     
     extra_labels = set(symbs) - set(labels)
     if extra_labels:
-        ltps = get_ltps(extra_labels, conf)
+        ltps = get_ltps(extra_labels)
+        # st.write(ltps)
 
         for k, v in ltps['data']:
             if k in extra_labels:
@@ -264,36 +330,44 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity, conf):
 
 
 
-resume = False
-st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
+response = st.experimental_get_query_params()
+if 'code' in response:
+    st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
+    login(response['code'][0])
+    st.success('Login Successfull!')
 
-conf, resume = setup_config()
-if not resume:
-    st.stop()
-    
-st.success('Login Successfull!')
+    # ins_data = load_instruments()
 
-data = get_holdings(conf)
+    data = get_holdings()
+    # st.write(data)
 
-profile = get_profile(conf)
+    profile = get_profile()
+    # st.write(profile)
 
-st.header(f"Welcome {profile['data']['user_name']}")
-pnl(data['data'])
-plot_pnl(data['data'])
-st.markdown('##')
-
-with st.expander('Show Holdings'):
-    get_investments_plot_by_price(data['data'])
+    st.header(f"Welcome {profile['data']['user_name']}")
+    pnl(data['data'])
+    plot_pnl(data['data'])
     st.markdown('##')
 
-st.subheader('Set Goals Here:')
+    with st.expander('Show Holdings'):
+        get_investments_plot_by_price(data['data'])
+        st.markdown('##')
+        # get_all_sell_estimates(data['data'])
 
-symbs = st.multiselect(
-    'Select The Appropriate Symbols:',
-    options= [name['company_name'] for name in data['data']],
-    default= [name['company_name'] for name in data['data']]
-)
-quantity = st.slider('Quantity(s) [ALL]:', 1, 100, value=10, step=1)
+    # with st.expander('Show Goals'):
+    st.subheader('Set Goals Here:')
 
-get_wannabe_investments_plot_by_price(data['data'], symbs, quantity, conf)
-st.markdown('##')
+    # ops = list(ins_data['tradingsymbol'].unique())
+    # ops.extend([name['company_name'] for name in data['data']])
+    symbs = st.multiselect(
+        'Select The Appropriate Symbols:',
+        options= [name['company_name'] for name in data['data']],
+        default= [name['company_name'] for name in data['data']]
+    )
+    quantity = st.slider('Quantity(s) [ALL]:', 1, 100, value=10, step=1)
+
+    get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
+    st.markdown('##')
+
+else:
+    connect()
