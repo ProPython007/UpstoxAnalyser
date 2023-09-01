@@ -23,6 +23,21 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
 
+@st.cache_resource
+def setup_config(code):
+    conf = get_details()
+
+    if conf['code'] != code:
+        conf['code'] = code
+
+        login_response = login(conf)
+
+        access_token = login_response['access_token']
+        conf['access_token'] = access_token
+
+    return conf
+
+
 def connect(conf):
     redirect_url = urllib.parse.quote(conf['rurl'], safe='')
     uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf['apiKey']}&redirect_uri={redirect_url}"
@@ -265,18 +280,7 @@ response = st.experimental_get_query_params()
 if 'code' in response:
     st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
 
-    conf = get_details()
-
-    if conf['code'] != response['code'][0]:
-        conf['code'] = response['code'][0]
-
-        login_response = login(conf)
-
-        if not login_response:
-            st.stop()
-
-        access_token = login_response['access_token']
-        conf['access_token'] = access_token
+    conf = setup_config(response['code'][0])
 
     st.success('Login Successfull!')
 
