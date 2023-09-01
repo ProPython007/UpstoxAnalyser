@@ -63,8 +63,10 @@ def login(code):
 
     hold = st.button('Click here to continue')
     if hold:
+        st.write(data)
         response = requests.post(url, headers=headers, data=data)
         json_response = response.json()
+        st.write(json_response)
         try:
             access_token = json_response['access_token']
             conf['access_token'] = access_token
