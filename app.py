@@ -57,7 +57,7 @@ def setup_config(code):
 
 
 def connect(conf):
-    redirect_url = urllib.parse.quote(conf['rurl'], safe='')
+    # redirect_url = urllib.parse.quote(conf['rurl'], safe='')
     uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf['apiKey']}&redirect_uri={redirect_url}"
 
     st.markdown(f'[Authorize with Upstox]({uri})')
