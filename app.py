@@ -22,7 +22,6 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
 
-@st.cache_resource
 def setup_config():
     with open('config.json') as f:
         conf_file = json.load(f)
@@ -61,7 +60,7 @@ def setup_config():
         
         conf_file['access_token'] = access_token
 
-        return conf_file
+        return conf_file, True
     
     else:
         uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf_file['apiKey']}&redirect_uri={conf_file['rurl']}"
@@ -265,10 +264,13 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity, conf):
 
 
 
+resume = False
 st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
 
-conf = setup_config()
-
+conf, resume = setup_config()
+if not resume:
+    st.stop()
+    
 st.success('Login Successfull!')
 
 data = get_holdings(conf)
