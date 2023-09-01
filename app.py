@@ -83,8 +83,8 @@ def store_details(conf):
         json.dump(conf, f)
 
 
-def get_profile():
-    conf = get_details()
+def get_profile(conf):
+    # conf = get_details()
 
     url = 'https://api-v2.upstox.com/user/profile'
     
@@ -99,7 +99,7 @@ def get_profile():
 
     st.header(f"Welcome {json_response['data']['user_name']}")
 
-    return json_response
+    # return json_response
 
 
 def pnl(data):
@@ -150,6 +150,8 @@ def get_holdings():
 
     response = requests.get(url, headers=headers)
     json_response = response.json()
+
+    get_profile(conf)
 
     return json_response
 
@@ -341,7 +343,7 @@ if 'code' in response:
     data = get_holdings()
     # st.write(data)
 
-    profile = get_profile()
+    # profile = get_profile()
     # st.write(profile)
 
     # st.header(f"Welcome {profile['data']['user_name']}")
