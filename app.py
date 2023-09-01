@@ -67,9 +67,10 @@ def login(code):
         access_token = json_response['access_token']
         conf['access_token'] = access_token
     except Exception:
-        uri = f"https://upstoxapi.streamlit.app"
-        st.markdown(f'[Something went wrong!!! Please restart the app]({uri})')
-        st.stop()
+        pass
+        # uri = f"https://upstoxapi.streamlit.app"
+        # st.markdown(f'[Something went wrong!!! Please restart the app]({uri})')
+        # st.stop()
 
     store_details(conf)
 
