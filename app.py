@@ -37,6 +37,7 @@ def connect():
     st.markdown(f'[Authorize with Upstox]({uri})')
 
 
+@st.cache_data
 def login(code):
     conf = get_details()
     conf['code'] = code
@@ -66,8 +67,8 @@ def login(code):
     try:
         access_token = json_response['access_token']
         conf['access_token'] = access_token
-    except Exception:
-        pass
+    except Exception as e:
+        st.write(e)
         # uri = f"https://upstoxapi.streamlit.app"
         # st.markdown(f'[Something went wrong!!! Please restart the app]({uri})')
         # st.stop()
