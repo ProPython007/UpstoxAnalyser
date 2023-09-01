@@ -62,18 +62,21 @@ def login(code):
         "grant_type": "authorization_code",
     }
 
-    response = requests.post(url, headers=headers, data=data)
-    json_response = response.json()
-    try:
-        access_token = json_response['access_token']
-        conf['access_token'] = access_token
-    except Exception as e:
-        st.write(e)
-        # uri = f"https://upstoxapi.streamlit.app"
-        # st.markdown(f'[Something went wrong!!! Please restart the app]({uri})')
-        # st.stop()
+    hold = st.button('Click here to continue')
+    if hold:
+        response = requests.post(url, headers=headers, data=data)
+        json_response = response.json()
+        try:
+            access_token = json_response['access_token']
+            conf['access_token'] = access_token
+        except Exception as e:
+            st.write(e)
+            # uri = f"https://upstoxapi.streamlit.app"
+            # st.markdown(f'[Something went wrong!!! Please restart the app]({uri})')
+            # st.stop()
 
     store_details(conf)
+    return hold
 
 
 def get_details():
@@ -335,7 +338,8 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity):
 response = st.experimental_get_query_params()
 if 'code' in response:
     st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
-    login(response['code'][0])
+    if not login(response['code'][0]):
+        st.stop()
     st.success('Login Successfull!')
 
     # ins_data = load_instruments()
