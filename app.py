@@ -5,6 +5,7 @@ import pandas as pd
 import pandas as pd
 import requests
 import json
+import time
 
 
 
@@ -51,6 +52,7 @@ def setup_config():
         }
 
         response = requests.post(url, headers=headers, data=data)
+        time.sleep(3)
         json_response = response.json()
         st.write(f'\njres: {json_response}')
 
@@ -58,7 +60,7 @@ def setup_config():
         
         conf_file['access_token'] = access_token
 
-        return conf_file
+        return conf_file, True
     
     else:
         uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf_file['apiKey']}&redirect_uri={conf_file['rurl']}"
@@ -262,9 +264,12 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity, conf):
 
 
 
+resume = False
 st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
 
-conf = setup_config()
+conf, resume = setup_config()
+if not resume:
+    st.stop()
 
 st.success('Login Successfull!')
 
