@@ -23,12 +23,6 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
 
-# @st.cache_data
-# def load_instruments():
-#     data = pd.read_csv('NSE.csv')
-#     return data
-
-
 def connect(conf):
     redirect_url = urllib.parse.quote(conf['rurl'], safe='')
     uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf['apiKey']}&redirect_uri={redirect_url}"
@@ -183,46 +177,6 @@ def get_investments_plot_by_price(data):
     st.markdown(f'Total Amount Invested: {sum(values):.2f} /-')
 
 
-# def get_sell_charges(ins_token, quan, price):
-#     conf = get_details()
-
-#     url = 'https://api-v2.upstox.com/charges/brokerage'    
-    
-#     headers = {
-#         "accept": "application/json",
-#         "Api-Version": "2.0",
-#         "Authorization": f"Bearer {conf['access_token']}",
-#     }
-#     params = {
-#         "instrument_token": ins_token,
-#         "quantity": quan,
-#         "product": "D",
-#         "transaction_type": "SELL",
-#         "price": price
-#     }
-
-#     response = requests.get(url, headers=headers, params=params)
-#     json_response = response.json()
-#     st.write(json_response)
-
-#     return json_response['data']['charges']['total']
-
-
-# def get_all_sell_estimates(data):
-#     labels = [name['company_name'] for name in data]
-#     ins_tokens = [tok['instrument_token'] for tok in data]
-#     qts = [qt['quantity'] for qt in data]
-#     ltp = [lt['last_price'] for lt in data]
-#     charges = []
-
-#     for a, b, c in zip(ins_tokens, qts, ltp):
-#         charges.append(get_sell_charges(a, b, c))
-
-#     st.write(labels)
-#     st.write(ltp)
-#     st.write(charges)
-
-
 def get_ltps(symbs):
     to_fetch = ','.join(symbs)
     conf = get_details()
@@ -245,9 +199,6 @@ def get_ltps(symbs):
 
 
 def get_wannabe_investments_plot_by_price(data, symbs, quantity):
-    # labels = [name['company_name'] for name in data]
-    # values = [price['last_price']*(quantity - price['quantity']) if (price['last_price']*(quantity - price['quantity'])) > 0 else 0 for price in data]
-    # qts = [quantity - qt['quantity'] if (quantity - qt['quantity']) > 0 else 0 for qt in data]
     labels = []
     values = []
     qts = []
@@ -260,7 +211,6 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity):
     extra_labels = set(symbs) - set(labels)
     if extra_labels:
         ltps = get_ltps(extra_labels)
-        # st.write(ltps)
 
         for k, v in ltps['data']:
             if k in extra_labels:
@@ -317,7 +267,6 @@ if 'code' in response:
 
     conf = get_details()
     conf['code'] = response['code'][0]
-    # store_details(conf)
 
     login_response = login(conf)
     try:
@@ -325,17 +274,12 @@ if 'code' in response:
         conf['access_token'] = access_token
     except Exception:
         pass
-    # store_details(conf)
     st.success('Login Successfull!')
 
-    # ins_data = load_instruments()
-    # conf = get_details()
-
     data = get_holdings(conf)
-    # st.write(data)
 
     profile = get_profile(conf)
-    # st.write(profile)
+    st.write(profile)
 
     st.header(f"Welcome {profile['data']['user_name']}")
     pnl(data['data'])
@@ -345,13 +289,9 @@ if 'code' in response:
     with st.expander('Show Holdings'):
         get_investments_plot_by_price(data['data'])
         st.markdown('##')
-        # get_all_sell_estimates(data['data'])
 
-    # with st.expander('Show Goals'):
     st.subheader('Set Goals Here:')
 
-    # ops = list(ins_data['tradingsymbol'].unique())
-    # ops.extend([name['company_name'] for name in data['data']])
     symbs = st.multiselect(
         'Select The Appropriate Symbols:',
         options= [name['company_name'] for name in data['data']],
@@ -361,6 +301,8 @@ if 'code' in response:
 
     get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
     st.markdown('##')
+
+    store_details(conf)
 
 else:
     conf = get_details()
