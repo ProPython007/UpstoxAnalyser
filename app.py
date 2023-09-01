@@ -38,7 +38,7 @@ def setup_config(code):
         "Content-Type": "application/x-www-form-urlencoded",
     }
     data = {
-        "code": conf['code'],
+        "code": code,
         "client_id": conf['apiKey'],
         "client_secret": conf['secretKey'],
         "redirect_uri": conf['rurl'],
