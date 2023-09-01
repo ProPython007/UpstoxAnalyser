@@ -2,7 +2,6 @@ import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
 import pandas as pd
-import urllib.parse
 import pandas as pd
 import requests
 import json
@@ -24,43 +23,44 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
 @st.cache_resource
-def setup_config(code):
-    st.write(f'\ncode: {code}')
-    conf = get_details()
+def setup_config():
+    response = st.experimental_get_query_params()
+    if 'code' in response:
+        code = response['code'][0]
+        st.write(f'\ncode: {code}')
+        conf_file = get_details()
 
-    conf['code'] = code
+        conf_file['code'] = code
 
-    url = "https://api-v2.upstox.com/login/authorization/token"
+        url = "https://api-v2.upstox.com/login/authorization/token"
 
-    headers = {
-        "accept": "application/json",
-        "Api-Version": "2.0",
-        "Content-Type": "application/x-www-form-urlencoded",
-    }
-    data = {
-        "code": code,
-        "client_id": conf['apiKey'],
-        "client_secret": conf['secretKey'],
-        "redirect_uri": conf['rurl'],
-        "grant_type": "authorization_code",
-    }
+        headers = {
+            "accept": "application/json",
+            "Api-Version": "2.0",
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+        data = {
+            "code": code,
+            "client_id": conf_file['apiKey'],
+            "client_secret": conf_file['secretKey'],
+            "redirect_uri": conf_file['rurl'],
+            "grant_type": "authorization_code",
+        }
 
-    response = requests.post(url, headers=headers, data=data)
-    json_response = response.json()
-    st.write(f'\njres: {json_response}')
+        response = requests.post(url, headers=headers, data=data)
+        json_response = response.json()
+        st.write(f'\njres: {json_response}')
 
-    access_token = json_response['access_token']
+        access_token = json_response['access_token']
+        
+        conf_file['access_token'] = access_token
+
+        return conf_file
     
-    conf['access_token'] = access_token
-
-    return conf
-
-
-def connect(conf):
-    # redirect_url = urllib.parse.quote(conf['rurl'], safe='')
-    uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf['apiKey']}&redirect_uri={conf['rurl']}"
-
-    st.markdown(f'[Authorize with Upstox]({uri})')
+    else:
+        uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf['apiKey']}&redirect_uri={conf['rurl']}"
+        st.markdown(f'[Authorize with Upstox]({uri})')
+        st.stop()
 
 
 def get_details():
@@ -266,39 +266,33 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity):
 
 
 
-response = st.experimental_get_query_params()
-if 'code' in response:
-    st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
+st.sidebar.markdown('In case of any errors: [restart-app](https://upstoxapi.streamlit.app)')
 
-    conf = setup_config(response['code'][0])
+conf = setup_config()
 
-    st.success('Login Successfull!')
+st.success('Login Successfull!')
 
-    data = get_holdings(conf)
+data = get_holdings(conf)
 
-    profile = get_profile(conf)
+profile = get_profile(conf)
 
-    st.header(f"Welcome {profile['data']['user_name']}")
-    pnl(data['data'])
-    plot_pnl(data['data'])
+st.header(f"Welcome {profile['data']['user_name']}")
+pnl(data['data'])
+plot_pnl(data['data'])
+st.markdown('##')
+
+with st.expander('Show Holdings'):
+    get_investments_plot_by_price(data['data'])
     st.markdown('##')
 
-    with st.expander('Show Holdings'):
-        get_investments_plot_by_price(data['data'])
-        st.markdown('##')
+st.subheader('Set Goals Here:')
 
-    st.subheader('Set Goals Here:')
+symbs = st.multiselect(
+    'Select The Appropriate Symbols:',
+    options= [name['company_name'] for name in data['data']],
+    default= [name['company_name'] for name in data['data']]
+)
+quantity = st.slider('Quantity(s) [ALL]:', 1, 100, value=10, step=1)
 
-    symbs = st.multiselect(
-        'Select The Appropriate Symbols:',
-        options= [name['company_name'] for name in data['data']],
-        default= [name['company_name'] for name in data['data']]
-    )
-    quantity = st.slider('Quantity(s) [ALL]:', 1, 100, value=10, step=1)
-
-    get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
-    st.markdown('##')
-
-else:
-    conf = get_details()
-    connect(conf)
+get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
+st.markdown('##')
