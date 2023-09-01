@@ -24,11 +24,14 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 @st.cache_resource
 def setup_config():
+    with open('config.json') as f:
+        conf_file = json.load(f)
+
     response = st.experimental_get_query_params()
+
     if 'code' in response:
         code = response['code'][0]
         st.write(f'\ncode: {code}')
-        conf_file = get_details()
 
         conf_file['code'] = code
 
@@ -58,15 +61,9 @@ def setup_config():
         return conf_file
     
     else:
-        uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf['apiKey']}&redirect_uri={conf['rurl']}"
+        uri = f"https://api-v2.upstox.com/login/authorization/dialog?response_type=code&client_id={conf_file['apiKey']}&redirect_uri={conf_file['rurl']}"
         st.markdown(f'[Authorize with Upstox]({uri})')
         st.stop()
-
-
-def get_details():
-    with open('config.json') as f:
-        data = json.load(f)
-    return data
 
 
 def get_profile(conf):
@@ -182,9 +179,8 @@ def get_investments_plot_by_price(data):
     st.markdown(f'Total Amount Invested: {sum(values):.2f} /-')
 
 
-def get_ltps(symbs):
+def get_ltps(symbs, conf):
     to_fetch = ','.join(symbs)
-    conf = get_details()
 
     url = 'https://api-v2.upstox.com/market-quote/ltp' 
     
@@ -203,7 +199,7 @@ def get_ltps(symbs):
     return json_response
 
 
-def get_wannabe_investments_plot_by_price(data, symbs, quantity):
+def get_wannabe_investments_plot_by_price(data, symbs, quantity, conf):
     labels = []
     values = []
     qts = []
@@ -215,7 +211,7 @@ def get_wannabe_investments_plot_by_price(data, symbs, quantity):
     
     extra_labels = set(symbs) - set(labels)
     if extra_labels:
-        ltps = get_ltps(extra_labels)
+        ltps = get_ltps(extra_labels, conf)
 
         for k, v in ltps['data']:
             if k in extra_labels:
@@ -294,5 +290,5 @@ symbs = st.multiselect(
 )
 quantity = st.slider('Quantity(s) [ALL]:', 1, 100, value=10, step=1)
 
-get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
+get_wannabe_investments_plot_by_price(data['data'], symbs, quantity, conf)
 st.markdown('##')
