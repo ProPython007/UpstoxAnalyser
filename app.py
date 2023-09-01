@@ -5,7 +5,6 @@ import pandas as pd
 import pandas as pd
 import requests
 import json
-import time
 
 
 
@@ -29,6 +28,7 @@ def setup_config():
         conf_file = json.load(f)
 
     response = st.experimental_get_query_params()
+    st.write(response)
 
     if 'code' in response:
         code = response['code'][0]
@@ -52,7 +52,6 @@ def setup_config():
         }
 
         response = requests.post(url, headers=headers, data=data)
-        time.sleep(3)
         json_response = response.json()
         st.write(f'\njres: {json_response}')
 
