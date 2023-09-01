@@ -25,7 +25,7 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 @st.cache_resource
 def setup_config(code):
-    print('\ncode:', code)
+    st.write(f'\ncode: {code}')
     conf = get_details()
 
     conf['code'] = code
@@ -47,7 +47,7 @@ def setup_config(code):
 
     response = requests.post(url, headers=headers, data=data)
     json_response = response.json()
-    print('\njres:', json_response)
+    st.write(f'\njres: {json_response}')
 
     access_token = json_response['access_token']
     
