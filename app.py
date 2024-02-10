@@ -203,6 +203,57 @@ def get_investments_plot_by_price(data):
     st.markdown(f'Total Amount Invested: {sum(values):.2f} /-')
 
 
+def get_sell_charges(ins_token, quan, price, prod, temp=None):
+    conf = get_details()
+    url = 'https://api-v2.upstox.com/charges/brokerage'    
+    
+    headers = {
+        "accept": "application/json",
+        "Api-Version": "2.0",
+        "Authorization": f"Bearer {conf['access_token']}",
+    }
+    params = {
+        "instrument_token": ins_token,
+        "quantity": quan,
+        "product": prod,
+        "transaction_type": "SELL",
+        "price": price
+    }
+
+    response = requests.get(url, headers=headers, params=params)
+    json_response = response.json()
+    
+    dp_charge = 18.5
+    grace = 20
+    
+    return json_response['data']['charges']['total'] + dp_charge + grace
+
+
+def get_all_sell_estimates(data):
+    labels = [name['company_name'] for name in data]
+    ins_tokens = [tok['instrument_token'] for tok in data]
+    qts = [qt['quantity'] for qt in data]
+    ltp = [lt['last_price'] for lt in data]
+    byp = [bp['average_price'] for bp in data]
+    prod = [p['product'] for p in data]
+
+    ttax = 0
+    for l, a, b, c, p, bp in zip(labels, ins_tokens, qts, ltp, prod, byp):
+        sell_charge = get_sell_charges(a, b, c, p, l)
+        ttax += sell_charge
+
+    net_pnl = 0
+    initial = sum([avg_price['average_price']*avg_price['quantity'] for avg_price in data])
+    
+    for pnl in data:
+        net_pnl += pnl['pnl']
+
+    current = initial + net_pnl - ttax
+
+    per = (current - initial) / initial
+    st.write(f"NET PNL (with other charges {ttax}) of Rs. {initial:.2f}/- is: {(current - initial):.2f}/- (PORTFOLIO VALUE: {current:.2f} | {per*100:.2f}%)")
+
+
 # def get_sell_charges(ins_token, quan, price):
 #     conf = get_details()
 
@@ -368,6 +419,9 @@ if 'code' in response:
     quantity = st.slider('Quantity(s) [ALL]:', 1, 100, value=10, step=1)
 
     get_wannabe_investments_plot_by_price(data['data'], symbs, quantity)
+    st.markdown('##')
+
+    get_all_sell_estimates(data['data'])
     st.markdown('##')
 
 else:
