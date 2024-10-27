@@ -50,3 +50,9 @@ Once the server is running, access the dashboard at `http://localhost:8501`.
 
 1. Log in using Upstox credentials.
 2. Visualize portfolio data, set investment goals, and monitor performance with real-time data.
+
+
+## Preview
+
+![pp2](https://github.com/user-attachments/assets/463db84e-90a1-4117-95e4-2ef396e2f397)
+
